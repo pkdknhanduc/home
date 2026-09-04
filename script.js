@@ -83,3 +83,235 @@ if (clinicImage) {
     clinicImage.src = images[currentImage];
   }, 10000);
 }
+// ===============================
+// BẢNG GIÁ - ĐỌC TRỰC TIẾP TỪ EXCEL
+// ===============================
+
+const pricingCategory = document.getElementById("pricing-category");
+const pricingSearch = document.getElementById("pricing-search");
+const pricingTableBody = document.getElementById("pricing-table-body");
+const pricingCount = document.getElementById("pricing-count");
+
+let pricingData = {};
+
+async function loadPricingExcel() {
+
+    try {
+
+        const response = await fetch("./nhanduc2_data.xls");
+
+        if (!response.ok) {
+            throw new Error("Không tìm thấy file Excel");
+        }
+
+        const arrayBuffer = await response.arrayBuffer();
+
+        const workbook = XLSX.read(arrayBuffer, {
+            type: "array"
+        });
+
+        pricingData = {};
+
+        workbook.SheetNames.forEach(sheetName => {
+
+            const sheet = workbook.Sheets[sheetName];
+
+            const rows = XLSX.utils.sheet_to_json(sheet, {
+                header: 1,
+                defval: ""
+            });
+
+            const data = [];
+
+            // Excel có 2 dòng đầu là tiêu đề
+            for (let i = 2; i < rows.length; i++) {
+
+                const row = rows[i];
+
+                if (!row || row.length === 0) {
+                    continue;
+                }
+
+                const stt = row[0];
+                const ma = row[1];
+                const ten = row[2];
+                const donVi = row[3];
+                const gia = row[4];
+
+                // Bỏ dòng trống
+                if (
+                    stt === "" &&
+                    ma === "" &&
+                    ten === ""
+                ) {
+                    continue;
+                }
+
+                data.push({
+                    stt: stt,
+                    ma: ma,
+                    ten: ten,
+                    donVi: donVi,
+                    gia: gia
+                });
+            }
+
+            if (data.length > 0) {
+                pricingData[sheetName.trim()] = data;
+            }
+
+        });
+
+        // Xóa option "Đang tải..."
+        pricingCategory.innerHTML = "";
+
+        // Tạo danh sách loại dịch vụ
+        Object.keys(pricingData).forEach(category => {
+
+            const option = document.createElement("option");
+
+            option.value = category;
+            option.textContent = category;
+
+            pricingCategory.appendChild(option);
+
+        });
+
+        // Hiển thị bảng đầu tiên
+        renderPricing();
+
+    } catch (error) {
+
+        console.error("Lỗi đọc Excel:", error);
+
+        pricingCategory.innerHTML =
+            '<option value="">Không thể đọc file Excel</option>';
+
+        pricingCount.textContent =
+            "Không tìm thấy file nhanduc2_data.xls";
+
+    }
+
+}
+
+
+function formatPrice(price) {
+
+    if (
+        price === null ||
+        price === undefined ||
+        price === ""
+    ) {
+        return "Liên hệ";
+    }
+
+    const number = Number(
+        String(price).replace(/,/g, "")
+    );
+
+    if (isNaN(number)) {
+        return price;
+    }
+
+    return number.toLocaleString("vi-VN") + " đ";
+}
+
+
+function renderPricing() {
+
+    const category = pricingCategory.value;
+
+    const keyword =
+        pricingSearch.value
+            .trim()
+            .toLowerCase();
+
+    let rows = pricingData[category] || [];
+
+    // Tìm kiếm
+    if (keyword) {
+
+        rows = rows.filter(item => {
+
+            const ma =
+                String(item.ma || "")
+                    .toLowerCase();
+
+            const ten =
+                String(item.ten || "")
+                    .toLowerCase();
+
+            return (
+                ma.includes(keyword) ||
+                ten.includes(keyword)
+            );
+
+        });
+
+    }
+
+    pricingTableBody.innerHTML = "";
+
+    // Không có kết quả
+    if (rows.length === 0) {
+
+        pricingTableBody.innerHTML = `
+            <tr>
+                <td colspan="5"
+                    style="
+                        text-align:center;
+                        padding:40px;
+                    ">
+                    Không tìm thấy dịch vụ phù hợp.
+                </td>
+            </tr>
+        `;
+
+        pricingCount.textContent = "0 dịch vụ";
+
+        return;
+    }
+
+    // Hiển thị dữ liệu
+    rows.forEach(item => {
+
+        const tr = document.createElement("tr");
+
+        tr.innerHTML = `
+            <td>${item.stt}</td>
+
+            <td>${item.ma}</td>
+
+            <td>${item.ten}</td>
+
+            <td>${item.donVi}</td>
+
+            <td>${formatPrice(item.gia)}</td>
+        `;
+
+        pricingTableBody.appendChild(tr);
+
+    });
+
+    pricingCount.textContent =
+        `Hiển thị ${rows.length.toLocaleString("vi-VN")} dịch vụ`;
+
+}
+
+
+// Chọn loại dịch vụ
+pricingCategory.addEventListener(
+    "change",
+    renderPricing
+);
+
+
+// Tìm kiếm
+pricingSearch.addEventListener(
+    "input",
+    renderPricing
+);
+
+
+// Đọc Excel
+loadPricingExcel();
