@@ -52,7 +52,7 @@ form?.addEventListener('submit', (event) => {
 });
 
 const reviews = [
-  { quote: 'Tôi luôn cảm thấy được lắng nghe và chăm sóc tận tình mỗi lần đến Nhân Đức 2. Không gian sạch sẽ, bác sĩ giỏi và các bạn nhân viên rất dễ thương.', name: 'Nguyễn Trần Trường Tú', meta: 'Bệnh nhân nội khoa · 2 tuần trước', initials: 'TN' },
+  { quote: 'Tôi luôn cảm thấy được lắng nghe và chăm sóc tận tình mỗi lần đến Nhân Đức. Không gian sạch sẽ, bác sĩ giỏi và các bạn nhân viên rất dễ thương.', name: 'Nguyễn Trần Trường Tú', meta: 'Bệnh nhân nội khoa · 2 tuần trước', initials: 'TN' },
   { quote: 'Bác sĩ giải thích rất rõ ràng, nhẹ nhàng. Bé nhà mình vốn sợ đi khám nhưng lần này lại hợp tác và vui vẻ suốt buổi.', name: 'Phạm Hoàng Nam', meta: 'Phụ huynh bệnh nhi · 1 tháng trước', initials: 'PH' },
   { quote: 'Quy trình đặt lịch nhanh, không phải chờ lâu. Tôi đặc biệt yên tâm vì kết quả xét nghiệm được tư vấn rất kỹ.', name: 'Vũ Thanh Hà', meta: 'Bệnh nhân tầm soát · 3 tháng trước', initials: 'VT' }
 ];

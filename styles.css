@@ -1136,6 +1136,10 @@ form textarea {
     color: #fff
 }
 
+.site-footer a:hover {
+    color: #fff
+}
+
 .emergency {
     color: #f4c7b7;
     font: 700 17px var(--display);
