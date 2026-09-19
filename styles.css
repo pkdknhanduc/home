@@ -1459,8 +1459,8 @@ form textarea {
 }
 
 .brand-light::before {
-    filter: brightness(0) invert(1);
-    opacity: .95
+    filter: none;
+    opacity: 1
 }
 
 .brand::before {
